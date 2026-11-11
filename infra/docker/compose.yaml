@@ -1,0 +1,200 @@
+name: firstwork
+
+services:
+  db:
+    image: postgres:16-alpine
+    user: postgres
+    environment:
+      POSTGRES_DB: firstwork
+      POSTGRES_USER: firstwork
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_INITDB_ARGS: --data-checksums
+    secrets:
+      - db_password
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+      - /var/run/postgresql:rw,noexec,nosuid,size=16m
+    networks:
+      - backend
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 0.5
+    mem_limit: 256m
+    pids_limit: 100
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U firstwork -d firstwork"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "2"
+
+  api:
+    image: firstwork-api:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/api.Dockerfile
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/firstwork?connectTimeout=3&socketTimeout=5
+      DATABASE_USER: firstwork
+      SPRING_CONFIG_IMPORT: configtree:/run/secrets/
+      JAVA_TOOL_OPTIONS:
+        -XX:MaxRAMPercentage=60 -XX:ActiveProcessorCount=2 -Djava.io.tmpdir=/tmp
+    secrets:
+      - source: db_password
+        target: spring.datasource.password
+    ports:
+      - "127.0.0.1:18208:8080"
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      db:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=48m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 0.75
+    mem_limit: 512m
+    pids_limit: 128
+    stop_grace_period: 20s
+    healthcheck:
+      test:
+        [
+          CMD,
+          wget,
+          --quiet,
+          --timeout=4,
+          --output-document=/dev/null,
+          http://127.0.0.1:8080/actuator/health/readiness,
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "2"
+
+  web:
+    image: firstwork-web:local
+    build:
+      context: ../..
+      dockerfile: infra/docker/web.Dockerfile
+    ports:
+      - "127.0.0.1:18108:8080"
+    networks:
+      - frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 0.25
+    mem_limit: 64m
+    pids_limit: 32
+    healthcheck:
+      test:
+        [CMD, wget, --quiet, --output-document=/dev/null, "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "2"
+
+  api-check:
+    image: maven:3.9.11-eclipse-temurin-21
+    profiles: [tools]
+    working_dir: /workspace/services/api
+    volumes:
+      - ../..:/workspace
+    environment:
+      MAVEN_OPTS: -Xmx384m -XX:ActiveProcessorCount=2
+    command:
+      [
+        mvn,
+        --batch-mode,
+        --no-transfer-progress,
+        "-Dmaven.repo.local=/workspace/.local/m2",
+        "-DargLine=-Xmx256m -XX:ActiveProcessorCount=2",
+        verify,
+      ]
+    cpus: 1
+    mem_limit: 1g
+    pids_limit: 192
+    networks:
+      - tooling
+
+  web-check:
+    image: node:22-bookworm-slim
+    profiles: [tools]
+    working_dir: /workspace
+    volumes:
+      - ../..:/workspace
+      - web-modules:/workspace/node_modules
+      - web-workspace-modules:/workspace/apps/web/node_modules
+    environment:
+      npm_config_cache: /workspace/.local/npm-cache
+      NODE_OPTIONS: --max-old-space-size=384
+    command: [sh, -c, "npm ci --no-audit --no-fund && npm run check"]
+    cpus: 1
+    mem_limit: 768m
+    pids_limit: 192
+    networks:
+      - tooling
+
+  smoke:
+    image: mcr.microsoft.com/playwright:v1.65.0-noble
+    profiles: [tools]
+    working_dir: /workspace
+    volumes:
+      - ../..:/workspace
+      - web-modules:/workspace/node_modules:ro
+      - web-workspace-modules:/workspace/apps/web/node_modules:ro
+    environment:
+      CI: "true"
+      BASE_URL: http://web:8080
+      API_BASE_URL: http://api:8080
+      NODE_OPTIONS: --max-old-space-size=256
+    command: [npm, run, test:e2e]
+    cpus: 1
+    mem_limit: 1g
+    pids_limit: 256
+    shm_size: 128m
+    networks:
+      - frontend
+
+secrets:
+  db_password:
+    file: ../../.local/secrets/db_password
+
+volumes:
+  db-data:
+  web-modules:
+  web-workspace-modules:
+
+networks:
+  frontend:
+    ipam:
+      config:
+        - subnet: 198.18.108.0/28
+  backend:
+    internal: true
+  tooling:

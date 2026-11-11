@@ -1,0 +1,9 @@
+.local
+node_modules
+apps/web/node_modules
+apps/web/dist
+services/api/target
+package-lock.json
+*.pdf
+test-results
+playwright-report

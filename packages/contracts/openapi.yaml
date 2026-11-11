@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: FirstWork independent prototype - Phase 1
+  version: 0.1.0
+  description: |
+    Local, synthetic-only diagnostics. No authentication, domain writes, worker
+    records, documents, or employment decisions. Not for production or real data.
+servers:
+  - url: http://127.0.0.1:18208
+paths:
+  /api/v1/system:
+    get:
+      operationId: getSystemStatus
+      summary: Read system status from migrated PostgreSQL metadata
+      responses:
+        "200":
+          description: Database metadata was successfully read
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SystemStatus"
+        "503":
+          $ref: "#/components/responses/Problem"
+  /api/v1/sandbox/validate:
+    post:
+      operationId: validateSyntheticRequest
+      summary: Validate a synthetic reference without persisting it
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyntheticRequest"
+      responses:
+        "200":
+          description: Valid synthetic request; no data persisted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResult"
+        "400":
+          $ref: "#/components/responses/Problem"
+        "415":
+          $ref: "#/components/responses/Problem"
+  /actuator/health/liveness:
+    get:
+      operationId: getLiveness
+      summary: Process liveness, independent of database availability
+      responses:
+        "200":
+          $ref: "#/components/responses/Health"
+        "503":
+          $ref: "#/components/responses/Health"
+  /actuator/health/readiness:
+    get:
+      operationId: getReadiness
+      summary: Application readiness including the database
+      responses:
+        "200":
+          $ref: "#/components/responses/Health"
+        "503":
+          $ref: "#/components/responses/Health"
+components:
+  schemas:
+    SystemStatus:
+      type: object
+      additionalProperties: false
+      required: [service, phase, schemaVersion, database, syntheticOnly]
+      properties:
+        service:
+          const: firstwork-api
+        phase:
+          const: phase-1
+        schemaVersion:
+          type: string
+          minLength: 1
+        database:
+          const: reachable
+        syntheticOnly:
+          const: true
+    SyntheticRequest:
+      type: object
+      additionalProperties: false
+      required: [reference, synthetic]
+      properties:
+        reference:
+          type: string
+          minLength: 11
+          maxLength: 64
+          pattern: "^synthetic-[a-z0-9][a-z0-9-]{0,53}$"
+          examples: [synthetic-demo]
+        synthetic:
+          type: boolean
+          const: true
+    ValidationResult:
+      type: object
+      additionalProperties: false
+      required: [reference, accepted, persisted]
+      properties:
+        reference:
+          type: string
+        accepted:
+          const: true
+        persisted:
+          const: false
+    Problem:
+      type: object
+      required: [type, title, status, detail, instance]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+        errors:
+          type: array
+          items:
+            type: object
+            required: [field, message]
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+  responses:
+    Problem:
+      description: Request rejected or a required dependency is unavailable
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Health:
+      description: Health status; component details are never exposed
+      content:
+        application/vnd.spring-boot.actuator.v3+json:
+          schema:
+            type: object
+            required: [status]
+            properties:
+              status:
+                type: string
+                enum: [UP, DOWN, OUT_OF_SERVICE, UNKNOWN]

@@ -1,0 +1,22 @@
+{
+  "name": "firstwork",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Independent synthetic-only workforce onboarding prototype",
+  "workspaces": [
+    "apps/web"
+  ],
+  "engines": {
+    "node": ">=22.22.2 <23"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint --workspace apps/web && npm run test --workspace apps/web && npm run build --workspace apps/web",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "prettier": "3.9.10"
+  }
+}

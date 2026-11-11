@@ -1,0 +1,13 @@
+.git
+.local
+**/node_modules
+**/target
+!services/api/target
+services/api/target/*
+!services/api/target/firstwork-api-0.1.0.jar
+**/dist
+!apps/web/dist
+!apps/web/dist/**
+**/*.pdf
+test-results
+playwright-report
