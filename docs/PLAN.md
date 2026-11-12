@@ -74,7 +74,59 @@ unexecuted command.
 - [VERIFICATION.md](VERIFICATION.md) records commands, observed evidence, fixes,
   changed-file inventory, and unverified hosted-CI/production boundaries.
 
+## UI enhancement - 2026-11-12
+
+The requested visual enhancement is implemented without advancing beyond Phase 1. The
+workspace now includes a responsive navigation shell, a forest/lime visual system, live
+runtime architecture, timestamped connection status, an interactive JSON request/response
+inspector, inline reference validation, reset behavior, and an explicitly deferred
+roadmap.
+
+Verification observed: Prettier passed; Oxlint reported zero warnings/errors; 10 frontend
+tests, strict TypeScript, and the Vite production build passed. All 12 Chromium/API checks
+passed, including navigation/reflow at 320, 390, 768, 1024, 1280, and 1440 CSS pixels,
+keyboard interaction, error recovery, validation, JSON inspection, and reset.
+Desktop/mobile screenshots were inspected. A focused text-contrast check passed after
+refining the type scale and muted palette.
+
+Only the FirstWork web container was rebuilt. API/database services, network boundaries,
+ports, and resource limits were preserved and reverified. No new dependency,
+backend/domain feature, cloud operation, or Git mutation was added. An existing clean Git
+import was present at the start of this UI task; it was not created by this task. Details
+are in [VERIFICATION.md](VERIFICATION.md).
+
+## Art-directed revision - 2026-11-12
+
+The user clarified that a refined dashboard did not meet the visual goal. The
+sidebar/card-dashboard approach has therefore been replaced by an original, editorial
+site: oversized display/serif typography, local variable fonts, a reactive lime-and-chrome
+3D sculpture, a moving type ribbon, a dark live-engineering section, native roadmap
+disclosures, and a full-width typographic footer.
+
+The existing synthetic request lab and API contracts remain intact. The first API check
+finishes before the decorative renderer starts. Procedural studio textures replace the
+initially expensive lighting setup; rendering has explicit frame-rate/pixel-density caps
+and stops when hidden or offscreen. Reduced motion and WebGL-unavailable behavior were
+exercised in real Chromium.
+
+Observed: 10 unit tests, 16 Chromium/API tests, six responsive widths, keyboard
+navigation, real 3D rotation, reduced-motion behavior, local-only asset requests,
+2x-display render-size caps, and static-fallback lab submission passed. Lint, TypeScript,
+locked dependency restoration, and production build passed. A non-fatal optional 3D
+chunk-size warning is recorded rather than suppressed. Desktop/mobile compositions were
+visually inspected.
+
+No Phase 2 implementation, backend/database changes, other-project changes, or Git
+mutations were made. [VERIFICATION.md](VERIFICATION.md) contains failures observed, fixes,
+exact commands, changed files, and limitations.
+
 ## Next step after this increment
+
+Final follow-up: the contrast probe passed for 127 inspected text elements. A repeat
+browser run encountered two context-teardown timeouts after successful UI assertions; both
+exact cases passed when rerun unchanged. Runtime isolation and whitespace checks passed.
+The full history is retained in the verification report rather than reporting an
+uninterrupted clean run.
 
 Wait for explicit authorization to start Phase 2. First resolve the
 authentication/tenant/role model and audit ownership, then specify domain contracts,

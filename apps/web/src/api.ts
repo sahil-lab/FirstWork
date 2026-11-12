@@ -12,6 +12,12 @@ export interface ValidationResult {
   persisted: false;
 }
 
+export function apiErrorMessage(error: unknown): string {
+  return error instanceof Error
+    ? error.message
+    : "Unexpected API error. Check the local stack and try again.";
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }

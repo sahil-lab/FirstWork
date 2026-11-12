@@ -6,9 +6,10 @@ company systems, real employees, or real documents.
 
 ## Scope and current status
 
-**Verified locally:** 20 Java tests, 7 frontend tests, 6 Chromium/API smoke tests,
-formatting/lint/type checks/builds, runtime isolation, and database outage/recovery checks
-passed. All three runtime services are healthy. Hosted CI has not run.
+**Verified locally:** the UI refresh passes 10 frontend tests, 16 Chromium/API smoke
+tests, formatting, lint, type checking, and production build. The unchanged API previously
+passed 20 Java tests. Runtime isolation was rechecked; all three services are healthy.
+Hosted CI has not run.
 
 This increment implements **Phase 0 (contract and safety) and Phase 1 (working skeleton)
 only** from [the engineering guide](08_FirstWork_Onboarding.pdf). Implementation and
@@ -17,6 +18,29 @@ verification status are tracked in [the plan](docs/PLAN.md).
 The Phase 1 slice is a React/TypeScript status dashboard, a Java 21/Spring Boot 3 API,
 PostgreSQL, a Flyway bootstrap migration, health endpoints, and a non-persistent synthetic
 request-validation form.
+
+### Art-directed experience
+
+- Oversized editorial typography, a paper/ink/electric-lime palette, a moving typographic
+  ribbon, and distinct story, engineering, and roadmap sections.
+- An original Three.js possibility-loop sculpture with pointer response, rotation, pause
+  controls, reduced-motion support, and an explicit static fallback.
+- Locally bundled Manrope and Syne variable fonts; no remote font or image service.
+- Database-backed status with a real check timestamp, visible failures, and manual
+  refresh.
+- A synthetic request lab with inline validation, consent, a live JSON preview, actual
+  response inspection, and a reset that clears the result and consent.
+- Keyboard-accessible navigation and disclosures, reduced-motion support, readable
+  typography, and mobile-friendly inputs.
+
+The sculpture starts only after the initial API check settles. Rendering is capped at 24
+FPS and 1.25 device-pixel ratio, and stops offscreen or in a hidden tab. The optional 3D
+chunk is lazy-loaded; the request lab still works without WebGL. Original third-party
+notices are included in the [licenses folder](apps/web/public/licenses).
+
+The runtime display reports the latest response, not continuous monitoring. Planned
+workflows are labeled as unimplemented; the redesign adds no domain features or fabricated
+workforce metrics.
 
 **Not implemented:** employee or case management, document uploads, OCR, rules, human
 review, authentication/authorization, idempotent domain writes, events, Redis, Kafka,
@@ -37,7 +61,7 @@ From PowerShell in this project directory:
 
 The command initializes an ignored local database secret if necessary, verifies the code,
 builds the runtime images, starts the stack, and runs browser smoke tests. Detailed
-commands and observed results will be recorded in
+commands and observed results are recorded in
 [the verification report](docs/VERIFICATION.md).
 
 | Resource                 | Address / boundary                                  |

@@ -1,16 +1,44 @@
+@font-face {
+  font-family: "Manrope Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("@fontsource-variable/manrope/files/manrope-latin-wght-normal.woff2")
+    format("woff2");
+}
+
+@font-face {
+  font-family: "Syne Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400 800;
+  src: url("@fontsource-variable/syne/files/syne-latin-wght-normal.woff2") format("woff2");
+}
+
 :root {
-  font-family: "Segoe UI", system-ui, sans-serif;
-  color: #203341;
-  background: #f4f7f8;
+  font-family: "Manrope Variable", sans-serif;
+  color: #20251f;
+  background: #f2f1e9;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --paper: #f2f1e9;
+  --ink: #20251f;
+  --muted: #64685e;
+  --acid: #d1fb68;
+  --line: #242d242e;
+  --display: "Syne Variable", sans-serif;
+  --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
   line-height: 1.6;
 }
 
 * {
   box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 110px;
 }
 body {
   margin: 0;
@@ -20,36 +48,76 @@ button,
 input {
   font: inherit;
 }
-button {
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: #096b60;
-  color: white;
-  padding: 0.65rem 1rem;
-  font-weight: 600;
+button,
+a,
+input,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+button,
+summary {
   cursor: pointer;
 }
-button:hover:not(:disabled) {
-  background: #07574e;
-}
 button:disabled {
-  opacity: 0.55;
   cursor: not-allowed;
 }
-:focus-visible {
-  outline: 3px solid #178bcd;
-  outline-offset: 3px;
-}
-h1,
-h2,
-p {
-  margin-top: 0;
-}
-h2 {
-  font-size: 1.25rem;
-  line-height: 1.35;
-  margin-bottom: 0.9rem;
+button,
+a,
+summary {
+  touch-action: manipulation;
 }
 a {
   color: inherit;
+}
+button,
+input,
+summary,
+a {
+  outline-offset: 5px;
+}
+:focus-visible {
+  outline: 3px solid #6387db;
+}
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+}
+button,
+a {
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    border-color 0.2s,
+    transform 0.25s;
+}
+code,
+pre {
+  font-family: var(--mono);
+}
+::selection {
+  background: var(--acid);
+  color: var(--ink);
+}
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }

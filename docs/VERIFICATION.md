@@ -223,7 +223,198 @@ secret contents, reports, and build products are not source files and are ignore
 - Empty reserved directories: [worker](../services/worker/.gitkeep) and
   [benchmarks](../benchmarks/.gitkeep); no worker or benchmark is implemented.
 
-## Limitations and next step
+## UI enhancement verification - 2026-11-12
+
+This follow-up changes presentation and diagnostic UX only. The earlier Phase 0-1 ledger
+above remains a record of the initial implementation, not a new claim that Java tests or a
+database outage experiment were rerun for a UI-only change. Git already contained a clean
+initial import at the start of the UI task; this task performed no Git initialization,
+commit, or remote operation.
+
+### Changes
+
+- New responsive workspace shell, brand treatment, forest/lime palette, shared typography
+  scale, compact sidebar, mobile navigation, and local runtime map.
+- Runtime status remains database-backed. Loading and failed checks do not advertise
+  connected dependencies; successful checks display their actual browser-local timestamp.
+  Monitoring remains manual.
+- The request lab provides inline invalid-reference feedback, a character counter,
+  mandatory synthetic confirmation, disabled invalid/pending submits, expandable live
+  request JSON, actual response JSON, and focused reset behavior. Reset clears consent and
+  previous success; no input is persisted.
+- Native disclosures, skip navigation, focus indicators, and reduced-motion support
+  preserve keyboard access without an additional UI framework.
+- Planned workers, document review, and later build phases are explicitly labeled as
+  unimplemented. No fake worker counts or decision metrics were added.
+
+### Observed results
+
+| Check                                       | Observed result                                                                                                                   |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Prettier                                    | Passed                                                                                                                            |
+| Oxlint                                      | Zero warnings and errors                                                                                                          |
+| Frontend unit tests                         | 10 passed                                                                                                                         |
+| Strict TypeScript and Vite production build | Passed                                                                                                                            |
+| Chromium/API smoke suite                    | 12 passed, zero retries                                                                                                           |
+| Responsive layout and anchor navigation     | Passed at 320, 390, 768, 1024, 1280, and 1440 CSS pixels; no document-level horizontal overflow                                   |
+| Request lab                                 | Actual successful response, JSON preview/response, invalid-input feedback, reset, and consent checks passed                       |
+| Keyboard                                    | Skip link focuses main; native JSON disclosure toggles with Enter; reset focuses the reference input                              |
+| Failure path                                | Visible API failure; explicit refresh restores connected status                                                                   |
+| Visual inspection                           | Full-page desktop (1440 px) and mobile (390 px) screenshots inspected                                                             |
+| Readability refinement                      | Initial tiny captions replaced with a shared 10-17 px UI type scale; mobile request input measured at 16 px                       |
+| Focused text contrast                       | 104 rendered text elements inspected; no normal-sized checked text below 4.5:1 after palette refinement                           |
+| FirstWork runtime verification              | API/db/web healthy; configured CPU/memory/PID limits, non-root/read-only runtime, private DB and reserved loopback ports verified |
+| Backend changes / Java rerun                | None / not rerun for this UI-only increment                                                                                       |
+| Hosted CI                                   | Not run                                                                                                                           |
+
+The focused contrast probe evaluated visible text on solid backgrounds, excluding disabled
+controls, decorative SVGs, and gradient/code panels. This is not a full WCAG audit or a
+claim of accessibility certification. The phrase "10000 times" was treated as a request
+for a substantial redesign, not a measurable multiplier.
+
+### Reproduce the UI checks and local web update
+
+```powershell
+Set-Location 'C:\Users\upadhsah\Desktop\project\FirstWork'
+docker compose -p firstwork -f infra\docker\compose.yaml --profile tools run --rm --no-deps web-check sh -c 'npm exec -- prettier --write apps/web/src tests/e2e/smoke.spec.mjs && npm run check'
+docker compose -p firstwork -f infra\docker\compose.yaml up --detach --build --no-deps --wait --wait-timeout 90 web
+.\scripts\firstwork.ps1 -Action Smoke
+.\scripts\verify-runtime.ps1
+```
+
+The actual UI commands used the existing named dependency volumes; no dependency
+installation or global runtime replacement was necessary. API and database containers were
+not rebuilt or restarted.
+
+### Changed files in the UI increment
+
+- [App.tsx](../apps/web/src/App.tsx): workspace shell, live status, runtime map,
+  navigation, safety principles, and roadmap.
+- [App.css](../apps/web/src/App.css) and [index.css](../apps/web/src/index.css):
+  responsive layout, design tokens, contrast, focus, and reduced-motion styling.
+- [Icon.tsx](../apps/web/src/Icon.tsx): lightweight inline SVG icons; no new dependency or
+  external asset request.
+- [RequestLab.tsx](../apps/web/src/RequestLab.tsx): synthetic request interaction, inline
+  feedback, actual response display, and reset.
+- [api.ts](../apps/web/src/api.ts): shared UI error-message helper; API contracts and
+  request semantics are unchanged.
+- [App.test.tsx](../apps/web/src/App.test.tsx) and
+  [smoke.spec.mjs](../tests/e2e/smoke.spec.mjs): focused UX regressions and six-width
+  browser checks.
+- [README.md](../README.md), [PLAN.md](PLAN.md), and [VERIFICATION.md](VERIFICATION.md):
+  usage, progress, and observed outcomes.
+
+## Art-directed revision - 2026-11-12
+
+The user requested a substantially more expressive, Awwwards-style experience rather than
+another dashboard refinement. The resulting design and procedural artwork are original; no
+Awwwards site was copied and no award/affiliation claim is made. The earlier UI ledger is
+historical. This revision replaces its sidebar/card layout while preserving the diagnostic
+API and request UX.
+
+### Implemented and observed
+
+- A paper/ink/electric-lime visual direction, oversized Syne/serif headlines, bundled
+  Manrope body type, restrained entrance motion, an animated type ribbon, distinct
+  editorial/live-lab sections, and a large typographic footer.
+- An original interactive Three.js sculpture: pointer response, accessible rotate control,
+  global pause, OS reduced-motion handling, and a visible static fallback if WebGL is
+  unavailable or its context is lost.
+- The initial API check settles before renderer initialization. Two generated 192 x 192
+  studio-lighting textures avoid real-time environment convolution. Rendering is capped at
+  24 FPS and 1.25 device-pixel ratio; intersection and visibility observers stop
+  scheduling work offscreen/in hidden tabs. Geometry, textures, renderer, observers, and
+  listeners are disposed on unmount.
+- Existing validation, synthetic consent, JSON inspection, reset, real PostgreSQL-backed
+  status, and safe error handling remain operational.
+
+| Check                         | Observed result                                                                         |
+| ----------------------------- | --------------------------------------------------------------------------------------- |
+| Locked dependency restoration | `npm ci` passed; 118 packages restored                                                  |
+| Prettier / Oxlint             | Passed; zero lint warnings/errors                                                       |
+| Unit tests                    | 10 passed                                                                               |
+| TypeScript / Vite build       | Passed                                                                                  |
+| Chromium/API suite            | 16 passed, zero retries                                                                 |
+| Reflow/navigation             | 320, 390, 768, 1024, 1280, 1440 CSS pixels passed with no document overflow             |
+| Original 3D rendering         | Actual WebGL renderer initialized; rotating a paused sculpture changed its canvas image |
+| Reduced motion                | Starts paused; animated ribbon disabled; explicit rotation still works                  |
+| No-WebGL failure path         | Visible static fallback; the real synthetic request still succeeds                      |
+| High-density display          | At device ratio 2, actual canvas dimensions did not exceed 1.25 x CSS size              |
+| Asset privacy                 | Actual font and renderer requests remained same-origin; both bundled fonts loaded       |
+| Visual inspection             | Desktop hero/full-page and mobile screenshots inspected                                 |
+| Backend / hosted CI           | Unchanged / not rerun                                                                   |
+
+### Failures fixed, not hidden
+
+1. The new Fontsource versions did not provide the assumed `latin.css` entry point.
+   Inspection of the installed packages identified their actual WOFF2 files; explicit
+   local `@font-face` declarations fixed the build.
+2. The first physical-lighting/environment-convolution implementation delayed the main
+   thread enough to fail the 768 px API-status smoke assertion. The renderer was replaced
+   with lightweight procedural matcap studio lighting, and API initialization now precedes
+   decorative rendering. The same timeouts were retained; all browser cases subsequently
+   passed.
+3. A focused rendered-text contrast check found several weak caption colors. Those colors
+   were darkened without changing layout or hiding text.
+
+Vite reports a non-fatal warning because the optional renderer chunk is 531.69 kB minified
+(131.98 kB gzip). It is already dynamically imported rather than included in the core UI
+chunk. The warning was not suppressed. The main UI is 250.96 kB minified (77.35 kB gzip),
+and the two local font files total 59.43 kB. These are observed build artifact sizes, not
+performance benchmarks. No browser/GPU compatibility or accessibility certification is
+claimed.
+
+### Exact local commands
+
+The final focused contrast probe checked 127 visible text elements against solid
+backgrounds, with no failures at its normal/large-text thresholds. Decorative artwork,
+disabled controls, and the large decorative chapter numeral were excluded; this is not a
+full accessibility audit.
+
+After the color-only refinement, a repeat full browser run completed its UI assertions but
+reported browser-context teardown timeouts for the 390 px and 768 px cases (14 passed, 2
+teardown failures). Those exact two cases were rerun unchanged and both passed, including
+teardown. No timeout was increased, test disabled, or application behavior bypassed. The
+earlier clean 16-test run and these final focused results are distinct observations, not
+one fabricated run. Runtime/isolation and Git whitespace checks also passed.
+
+The focused recheck command was:
+
+```powershell
+docker compose -p firstwork -f infra\docker\compose.yaml --profile tools run --rm --no-deps smoke npm run test:e2e -- --grep '390px|768px'
+```
+
+```powershell
+Set-Location 'C:\Users\upadhsah\Desktop\project\FirstWork'
+docker compose -p firstwork -f infra\docker\compose.yaml --profile tools run --rm --no-deps web-check sh -c 'npm ci --no-audit --no-fund && npm run check'
+docker compose -p firstwork -f infra\docker\compose.yaml up --detach --build --no-deps --wait --wait-timeout 90 web
+.\scripts\firstwork.ps1 -Action Smoke
+.\scripts\verify-runtime.ps1
+```
+
+Only FirstWork's web container is rebuilt. API/database services and the existing Compose
+isolation/resource limits are retained.
+
+### Changed files relative to the previous UI
+
+- [App.tsx](../apps/web/src/App.tsx), [App.css](../apps/web/src/App.css), and
+  [index.css](../apps/web/src/index.css): new editorial composition, navigation, readable
+  visual hierarchy, live-system presentation, motion and typography.
+- [Sculpture.tsx](../apps/web/src/Sculpture.tsx),
+  [sculptureScene.ts](../apps/web/src/sculptureScene.ts), and
+  [useReducedMotion.ts](../apps/web/src/useReducedMotion.ts): lazy optional 3D, procedural
+  art, bounded rendering, controls, and fallback.
+- [package.json](../apps/web/package.json) and [package-lock.json](../package-lock.json):
+  pinned Three.js/types and local Manrope/Syne font dependencies.
+- [licenses](../apps/web/public/licenses): original MIT and OFL redistribution notices
+  copied from the installed packages.
+- [App.test.tsx](../apps/web/src/App.test.tsx), [setup.ts](../apps/web/src/test/setup.ts),
+  and [smoke.spec.mjs](../tests/e2e/smoke.spec.mjs): preserved functional tests and real
+  browser checks for new 3D, motion, fallback, local fonts and render caps.
+- [README.md](../README.md), [PLAN.md](PLAN.md), and this report: current behavior,
+  observed validation, exact commands, and limitations.
+
+## Remaining scope boundaries
 
 Only a diagnostic skeleton is in scope. Authentication, tenant isolation, permissions,
 audit records, retry/idempotency semantics, domain entities, onboarding decisions,
