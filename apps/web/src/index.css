@@ -15,22 +15,37 @@
   src: url("@fontsource-variable/syne/files/syne-latin-wght-normal.woff2") format("woff2");
 }
 
+@font-face {
+  font-family: "Instrument Serif";
+  font-style: italic;
+  font-display: swap;
+  font-weight: 400;
+  src: url("@fontsource/instrument-serif/files/instrument-serif-latin-400-italic.woff2")
+    format("woff2");
+}
+
 :root {
-  font-family: "Manrope Variable", sans-serif;
-  color: #20251f;
-  background: #f2f1e9;
+  font-family: "Manrope Variable", system-ui, sans-serif;
+  color: #f1f2ea;
+  background: #060807;
+  color-scheme: dark;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --paper: #f2f1e9;
-  --ink: #20251f;
-  --muted: #64685e;
-  --acid: #d1fb68;
-  --line: #242d242e;
-  --display: "Syne Variable", sans-serif;
-  --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
   line-height: 1.6;
+  --bg: #060807;
+  --ink: #f1f2ea;
+  --soft: #bcc3b3;
+  --line: #f1f2ea24;
+  --acid: #d1fb68;
+  --ember: #ff7847;
+  --paper: #f2f1e9;
+  --leaf: #1d2815;
+  --display: "Syne Variable", "Manrope Variable", sans-serif;
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --mono: "Cascadia Code", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -38,11 +53,12 @@
 }
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 110px;
+  scroll-padding-top: 96px;
 }
 body {
   margin: 0;
   min-width: 320px;
+  background: var(--bg);
 }
 button,
 input {
@@ -73,10 +89,10 @@ button,
 input,
 summary,
 a {
-  outline-offset: 5px;
+  outline-offset: 4px;
 }
 :focus-visible {
-  outline: 3px solid #6387db;
+  outline: 3px solid #8fb4ff;
 }
 h1,
 h2,
@@ -89,10 +105,10 @@ figure {
 button,
 a {
   transition:
-    background-color 0.2s,
-    color 0.2s,
-    border-color 0.2s,
-    transform 0.25s;
+    background-color 0.25s,
+    color 0.25s,
+    border-color 0.25s,
+    transform 0.45s var(--ease);
 }
 code,
 pre {
@@ -100,7 +116,7 @@ pre {
 }
 ::selection {
   background: var(--acid);
-  color: var(--ink);
+  color: var(--leaf);
 }
 summary {
   list-style: none;

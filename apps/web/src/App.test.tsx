@@ -10,8 +10,8 @@ vi.mock("./api", async (importOriginal) => ({
   validateSandbox: vi.fn(),
 }));
 
-vi.mock("./Sculpture", () => ({
-  Sculpture: () => <div aria-label="Decorative sculpture" />,
+vi.mock("./SceneCanvas", () => ({
+  SceneCanvas: () => null,
 }));
 
 beforeEach(() => {
@@ -25,7 +25,7 @@ beforeEach(() => {
   });
 });
 
-describe("Phase 1 dashboard", () => {
+describe("Phase 1 experience", () => {
   it("loads real status and requires synthetic confirmation before submitting", async () => {
     const user = userEvent.setup();
     vi.mocked(validateSandbox).mockResolvedValue({

@@ -86,6 +86,26 @@ try {
     Assert-True ($tables -eq 'flyway_schema_history,prototype_metadata') 'Unexpected domain tables exist in Phase 1.'
     Write-Output "PostgreSQL verified: Flyway=$migration; public tables=$tables."
 
+    # Docker can start these containers in any order after it restarts, so the web
+    # server has to come up even when its API upstream cannot be resolved yet.
+    $webImage = ($inspection | Where-Object { $_.Config.Labels.'com.docker.compose.service' -eq 'web' }).Image
+    $probe = & docker run --detach --network none --read-only --tmpfs '/tmp:rw,noexec,nosuid,size=16m' --cap-drop ALL --security-opt 'no-new-privileges:true' --cpus 0.25 --memory 64m --pids-limit 32 $webImage
+    if ($LASTEXITCODE -ne 0) { throw 'Could not start the web start-order probe.' }
+    try {
+        $served = $false
+        foreach ($attempt in 1..20) {
+            if (-not (& docker ps --quiet --filter "id=$probe")) { break }
+            & docker exec $probe sh -c 'wget --quiet --output-document=/dev/null http://127.0.0.1:8080/ 2>/dev/null'
+            if ($LASTEXITCODE -eq 0) { $served = $true; break }
+            Start-Sleep -Milliseconds 500
+        }
+        if (-not $served) { & docker logs --tail 5 $probe }
+        Assert-True $served 'The web server does not start without its API upstream.'
+    } finally {
+        & docker rm --force $probe | Out-Null
+    }
+    Write-Output 'web verified: starts and serves the page without its API upstream.'
+
     if ($ExerciseDatabaseOutage) {
         Invoke-FirstWorkCompose pause db
         try {

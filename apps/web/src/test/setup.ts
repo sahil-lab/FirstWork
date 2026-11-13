@@ -14,3 +14,16 @@ vi.stubGlobal("matchMedia", (query: string): MediaQueryList => ({
   removeEventListener() {},
   dispatchEvent: () => true,
 }));
+
+// jsdom has no layout, so nothing ever scrolls into view.
+vi.stubGlobal(
+  "IntersectionObserver",
+  class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return [];
+    }
+  },
+);

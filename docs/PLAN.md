@@ -120,6 +120,41 @@ No Phase 2 implementation, backend/database changes, other-project changes, or G
 mutations were made. [VERIFICATION.md](VERIFICATION.md) contains failures observed, fixes,
 exact commands, changed files, and limitations.
 
+## Immersive rebuild - 2026-11-12
+
+The user said the art-directed page still fell short of an Awwwards-style experience. The
+page was rebuilt around a scroll-driven WebGL scene rather than a page with an object on
+it. The sculpture and its files were removed.
+
+What changed:
+
+- A fixed, full-viewport scene of about 28,000 particles that morphs through six forms as
+  the story scrolls, with a flowing backdrop, film grain, and cursor response. The network
+  form's colours reflect the latest real system check.
+- An opening curtain driven by real readiness, masked headline reveals, a statement that
+  lights up while scrolling, a moving type band, a pinned horizontal chapter, stacking
+  roadmap cards, a cursor follower, and magnetic buttons.
+- A dark palette with one sheet of "paper" left: the request lab, which is unchanged in
+  behaviour.
+
+Decisions:
+
+- Motion follows native scrolling. No scroll hijacking or smooth-scroll library.
+- No new runtime dependency beyond one bundled display font (Instrument Serif, OFL).
+- Slow devices and software renderers get a still scene that redraws per chapter, because
+  animating it there made the page itself unresponsive.
+- Frames drawn at rest are copied to a 2D canvas, because an idle WebGL surface lost its
+  picture after scrolling.
+
+Observed: 15 unit tests and 20 Chromium/API browser tests pass, with lint, type checking,
+locked dependency restoration, and production build. Of three full browser runs, two
+passed 20 of 20 and one had a single teardown timeout that did not repeat. Desktop and
+phone compositions were inspected from screenshots. This environment renders WebGL in
+software, so smooth animation on real graphics hardware was not observed here.
+
+No Phase 2 work, backend or database change, other-project change, or Git operation was
+made. Details, failures, and commands are in [VERIFICATION.md](VERIFICATION.md).
+
 ## Next step after this increment
 
 Final follow-up: the contrast probe passed for 127 inspected text elements. A repeat

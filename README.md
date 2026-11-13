@@ -6,37 +6,46 @@ company systems, real employees, or real documents.
 
 ## Scope and current status
 
-**Verified locally:** the UI refresh passes 10 frontend tests, 16 Chromium/API smoke
-tests, formatting, lint, type checking, and production build. The unchanged API previously
-passed 20 Java tests. Runtime isolation was rechecked; all three services are healthy.
-Hosted CI has not run.
+**Verified locally:** the current UI passes 15 frontend unit tests and 20 Chromium/API
+browser tests, plus formatting, lint, type checking, and production build. Two of three
+full browser runs passed cleanly; one had a single browser-teardown timeout that did not
+repeat. The unchanged API previously passed 20 Java tests. Runtime isolation was
+rechecked; all three services are healthy. Hosted CI has not run.
 
 This increment implements **Phase 0 (contract and safety) and Phase 1 (working skeleton)
 only** from [the engineering guide](08_FirstWork_Onboarding.pdf). Implementation and
 verification status are tracked in [the plan](docs/PLAN.md).
 
-The Phase 1 slice is a React/TypeScript status dashboard, a Java 21/Spring Boot 3 API,
-PostgreSQL, a Flyway bootstrap migration, health endpoints, and a non-persistent synthetic
-request-validation form.
+The Phase 1 slice is a React/TypeScript single-page experience, a Java 21/Spring Boot 3
+API, PostgreSQL, a Flyway bootstrap migration, health endpoints, and a non-persistent
+synthetic request-validation form.
 
-### Art-directed experience
+### Immersive experience
 
-- Oversized editorial typography, a paper/ink/electric-lime palette, a moving typographic
-  ribbon, and distinct story, engineering, and roadmap sections.
-- An original Three.js possibility-loop sculpture with pointer response, rotation, pause
-  controls, reduced-motion support, and an explicit static fallback.
-- Locally bundled Manrope and Syne variable fonts; no remote font or image service.
-- Database-backed status with a real check timestamp, visible failures, and manual
-  refresh.
+- A full-viewport WebGL scene of about 28,000 particles that reshapes itself as you
+  scroll: a sphere, scattered noise, a stack of documents, a three-node network, orbit
+  rings, and an asterisk. The network colours follow the latest real system check.
+- An opening curtain whose count follows real readiness (fonts, the system check, the
+  scene) and always lifts within a few seconds.
+- Oversized Syne and Instrument Serif headlines that slide in, a statement that lights up
+  word by word, a moving type band, a pinned horizontal chapter, and stacking roadmap
+  cards. Everything follows native scrolling; nothing takes over the scroll wheel.
+- A cursor follower and magnetic buttons for precise pointers only.
+- Database-backed status with a real check timestamp and browser-measured round trip,
+  visible failures, and manual refresh.
 - A synthetic request lab with inline validation, consent, a live JSON preview, actual
   response inspection, and a reset that clears the result and consent.
-- Keyboard-accessible navigation and disclosures, reduced-motion support, readable
-  typography, and mobile-friendly inputs.
+- Locally bundled Manrope, Syne, and Instrument Serif fonts; no remote font, image, or
+  script service.
 
-The sculpture starts only after the initial API check settles. Rendering is capped at 24
-FPS and 1.25 device-pixel ratio, and stops offscreen or in a hidden tab. The optional 3D
-chunk is lazy-loaded; the request lab still works without WebGL. Original third-party
-notices are included in the [licenses folder](apps/web/public/licenses).
+**Motion and performance.** The scene steps its resolution and particle count down on
+slower devices. On a software renderer, or a device too slow to animate it, the scene
+holds still and redraws only when the chapter changes, so the page stays responsive. The
+"Motion" control pauses all decorative movement, and the operating system's reduced-motion
+setting skips the curtain, the pinning, and every animation. Without WebGL the page shows
+a static backdrop and the lab still works. The scene code is a separate, lazily loaded
+chunk. Original third-party notices are in the
+[licenses folder](apps/web/public/licenses).
 
 The runtime display reports the latest response, not continuous monitoring. Planned
 workflows are labeled as unimplemented; the redesign adds no domain features or fabricated
@@ -82,6 +91,14 @@ form is persisted.
 .\scripts\firstwork.ps1 -Action Smoke
 .\scripts\firstwork.ps1 -Action Status
 .\scripts\verify-runtime.ps1 -ExerciseDatabaseOutage
+```
+
+The containers have no restart policy, so they stay stopped after Docker Desktop restarts
+and the dashboard refuses connections until they are started again. Bring them back,
+without re-running the checks, with:
+
+```powershell
+docker compose -p firstwork -f infra\docker\compose.yaml up --detach --wait db api web
 ```
 
 Stopping services is explicit and scoped to this project:
